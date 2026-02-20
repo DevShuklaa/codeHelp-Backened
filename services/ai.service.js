@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_KEY || 'default_api_key' // Provide a default value or handle the error
+  apiKey: process.env.GROQ_API_KEY
 });
 export const askAI = async (prompt) => {
   const completion = await groq.chat.completions.create({
