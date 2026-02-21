@@ -1,8 +1,8 @@
 import { askAI } from "../services/ai.service.js";
 
-export const testUser = async (req,res) => {
-  const { code, problem ,language ,outputLang} = req.body;
-   
+export const testUser = async (req, res) => {
+  const { code, problem, language, outputLang } = req.body;
+
   const prompt = `
     Test the user whith certain problems, which could be asked in interviews and coding rounds. This the problem statement on which you have 
     to ask question and you can also use the code provided by user if present.Ask about 10 questions from easy to hard and and provide all ans in last 
@@ -18,25 +18,41 @@ export const testUser = async (req,res) => {
   res.json({ response });
 }
 
-export const debugProb = async (req,res) => {
-  const {code,language} = req.body;
-   
+export const debugProb = async (req, res) => {
+  const { code, language } = req.body;
+
   const prompt = `
-  Check my following code and tell me every mistake.And tell me what  perfections i can do in this code.tell using the line no. which 
-  have mistake and the provide the complete perfect code in ${language} at last , dont include comments while explaining the code and if code 
-  is not completed tell the user code is incomlete in capitals and start, if code is incomlete dont provide complete code.
+  Check my following code and tell me every mistake. And tell me what perfections I can do in this code.
+  Tell using the line numbers which have mistakes. If the code is not completed, specify that it is incomplete.
+  Analyze the user's code and pinpoint any core programming weaknesses or conceptual misunderstandings they seem to be struggling with based on this snippet.
+  
+  IMPORTANT: You must return ONLY a valid JSON object with the following structure, and nothing else (no markdown wrapping, no extra text):
+  {
+    "mistakesAndFeedback": "Your detailed explanation of mistakes and perfections here...",
+    "perfectCode": "The complete perfect code in ${language} here... (If the code is incomplete, leave this as an empty string)",
+    "userWeaknesses": "A short, 1-3 word categorical phrase describing the core weakness (e.g., 'Time Complexity', 'Recursion', 'Syntax Error', 'Logic Error')"
+  }
 
   Code :
   ${code}
-
   `;
 
-  const response = await askAI(prompt);
-  res.json({ response });
+  try {
+    const rawResponse = await askAI(prompt);
+
+    // Clean up markdown blocks from response just in case the AI wraps the output
+    const cleanResponse = rawResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+
+    const parsedData = JSON.parse(cleanResponse);
+    res.json(parsedData);
+  } catch (error) {
+    console.error("Failed to parse AI response as JSON", error);
+    res.status(500).json({ error: "Failed to process AI response properly." });
+  }
 }
 
 export const askUser = async (req, res) => {
-  const {problem, code , outputLang } = req.body;
+  const { problem, code, outputLang } = req.body;
 
   const prompt = `
     
