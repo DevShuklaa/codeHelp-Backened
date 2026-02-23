@@ -1,7 +1,7 @@
 import { askAI } from "../services/ai.service.js";
 
 export const testUser = async (req, res) => {
-  const { code, problem, language, outputLang } = req.body;
+  const { code, problem, language, outputLang, apiKey } = req.body;
 
   const prompt = `
     Test the user whith certain problems, which could be asked in interviews and coding rounds. This the problem statement on which you have 
@@ -14,12 +14,12 @@ export const testUser = async (req, res) => {
   ${code}
   `;
 
-  const response = await askAI(prompt);
+  const response = await askAI(prompt, apiKey);
   res.json({ response });
 }
 
 export const debugProb = async (req, res) => {
-  const { code, language } = req.body;
+  const { code, language, apiKey } = req.body;
 
   const prompt = `
   Check my following code and tell me every mistake. And tell me what perfections I can do in this code.
@@ -43,7 +43,7 @@ export const debugProb = async (req, res) => {
   `;
 
   try {
-    const rawResponse = await askAI(prompt);
+    const rawResponse = await askAI(prompt, apiKey);
 
     // Clean up markdown blocks from response just in case the AI wraps the output
     const cleanResponse = rawResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
@@ -57,7 +57,7 @@ export const debugProb = async (req, res) => {
 }
 
 export const askUser = async (req, res) => {
-  const { problem, code, outputLang } = req.body;
+  const { problem, code, outputLang, apiKey } = req.body;
 
   const prompt = `
     
@@ -71,12 +71,12 @@ question:
 ${code}
 `;
 
-  const response = await askAI(prompt);
+  const response = await askAI(prompt, apiKey);
   res.json({ response });
 };
 
 export const explainProblem = async (req, res) => {
-  const { problem, outputLang, callCount = 1 } = req.body;
+  const { problem, outputLang, callCount = 1, apiKey } = req.body;
 
   let detailLevel = "in simple words";
   if (callCount === 2) {
@@ -93,12 +93,12 @@ Problem:
 ${problem}
 `;
 
-  const response = await askAI(prompt);
+  const response = await askAI(prompt, apiKey);
   res.json({ response });
 };
 
 export const giveHints = async (req, res) => {
-  const { problem, outputLang, callCount = 1 } = req.body;
+  const { problem, outputLang, callCount = 1, apiKey } = req.body;
 
   let hintLevel = "Give 3 helpful initial hints for this coding problem";
   if (callCount === 2) {
@@ -115,12 +115,12 @@ Problem:
 ${problem}
 `;
 
-  const response = await askAI(prompt);
+  const response = await askAI(prompt, apiKey);
   res.json({ response });
 };
 
 export const solveProblem = async (req, res) => {
-  const { problem, language, outputLang } = req.body;
+  const { problem, language, outputLang, apiKey } = req.body;
 
   const prompt = `
 Solve this coding problem in ${outputLang} language.
@@ -131,6 +131,6 @@ Problem:
 ${problem}
 `;
 
-  const response = await askAI(prompt);
+  const response = await askAI(prompt, apiKey);
   res.json({ response });
 };
