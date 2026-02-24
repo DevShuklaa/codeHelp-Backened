@@ -12,6 +12,10 @@ export const askAI = async (prompt, apiKey = null) => {
     throw new Error("No Groq API key provided in settings or environment variables.");
   }
 
+  // Print the API key to the console (masking most of it for security except first 8 chars)
+  const maskedKey = keyToUse.length > 8 ? keyToUse.substring(0, 8) + "..." : keyToUse;
+  console.log(`[AI-SERVICE] Using Groq API Key: ${maskedKey}`);
+
   const groqClient = new Groq({ apiKey: keyToUse });
 
   const completion = await groqClient.chat.completions.create({
